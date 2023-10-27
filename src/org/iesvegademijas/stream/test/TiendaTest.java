@@ -2,11 +2,9 @@ package org.iesvegademijas.stream.test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.*;
@@ -116,9 +114,13 @@ class TiendaTest {
 			prodHome.beginTransaction();
 			
 			List<Producto> listProd = prodHome.findAll();
+			List<String> listaNombrePrecio = listProd.stream()
+					.map(p -> "Nombre: "+p.getNombre()+" ,precio: "+p.getPrecio())
+					.toList();
 			
 			//TODO STREAMS
-	
+
+			listaNombrePrecio.forEach(System.out::println);
 			
 			prodHome.commitTransaction();
 		}
@@ -136,22 +138,29 @@ class TiendaTest {
 	 */
 	@Test
 	void test2() {
-		
+
 		ProductoHome prodHome = new ProductoHome();
-		
+
 		try {
-			prodHome.beginTransaction();			
+			prodHome.beginTransaction();
+
+			DecimalFormat df = new DecimalFormat("0.00");
+
 			List<Producto> listProd = prodHome.findAll();
-			
+			List<String> listaNombrePrecio = listProd.stream()
+					.map(p -> "Nombre: "+p.getNombre()+", precio en dolares: " + df.format(p.getPrecio()*1.06) + " $ ")
+					.toList();
+
 			//TODO STREAMS
-			
+
+			listaNombrePrecio.forEach(System.out::println);
 			prodHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
 			prodHome.rollbackTransaction();
 		    throw e; // or display error message
 		}
-		
+
 	}
 	
 	/**
@@ -165,10 +174,14 @@ class TiendaTest {
 		try {
 			prodHome.beginTransaction();
 		
-			List<Producto> listProd = prodHome.findAll();		
-						
+			List<Producto> listProd = prodHome.findAll();
+			List<String> listaNombrePrecio = listProd.stream()
+					.map(p -> "Nombre: "+p.getNombre().toUpperCase(Locale.ROOT)+" ,precio: "+p.getPrecio())
+					.toList();
+
 			//TODO STREAMS
-		
+
+			listaNombrePrecio.forEach(System.out::println);
 			prodHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
@@ -190,9 +203,14 @@ class TiendaTest {
 			fabHome.beginTransaction();
 	
 			List<Fabricante> listFab = fabHome.findAll();
-					
+			List<String> listaNombrePrecio = listFab.stream()
+					.map(fabricante -> fabricante.getNombre().toUpperCase().substring(0, 2) + fabricante.getNombre().substring(2))
+					.collect(Collectors.toList());
+
 			//TODO STREAMS
-					
+
+			listaNombrePrecio.forEach(System.out::println);
+
 			fabHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
@@ -213,7 +231,13 @@ class TiendaTest {
 			fabHome.beginTransaction();
 	
 			List<Fabricante> listFab = fabHome.findAll();
-					
+
+			List<Integer> listaNombrePrecio = listFab.stream()
+						.filter(fabricante -> !fabricante.getProductos().isEmpty())
+								.map(fabricante -> fabricante.getCodigo())
+										.toList();
+
+			listaNombrePrecio.forEach(System.out::println);
 			//TODO STREAMS
 		
 			fabHome.commitTransaction();
@@ -236,6 +260,12 @@ class TiendaTest {
 			fabHome.beginTransaction();
 	
 			List<Fabricante> listFab = fabHome.findAll();
+			List<String> listaNombrePrecio = listFab.stream()
+					.sorted((o1, o2) -> o1.getNombre().compareTo(o2.getNombre()))
+					.map(fabricante -> fabricante.getNombre())
+					.toList();
+
+			listaNombrePrecio.forEach(System.out::println);
 					
 			//TODO STREAMS
 		
@@ -257,15 +287,15 @@ class TiendaTest {
 		try {
 			prodHome.beginTransaction();
 		
-			List<Producto> listProd = prodHome.findAll();		
+			List<Producto> listProd = prodHome.findAll();
+			listProd.stream();
+
 						
 			//TODO STREAMS
 			
 			prodHome.commitTransaction();
 		}
-		catch (RuntimeException e) {
-			prodHome.rollbackTransaction();
-		    throw e; // or display error message
+		catch (RuntimeException e) {throw e; // or display error message
 		}
 		
 	}
