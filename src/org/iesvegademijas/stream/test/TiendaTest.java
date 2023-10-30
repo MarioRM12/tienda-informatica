@@ -204,7 +204,7 @@ class TiendaTest {
 	
 			List<Fabricante> listFab = fabHome.findAll();
 			List<String> listaNombrePrecio = listFab.stream()
-					.map(fabricante -> fabricante.getNombre().toUpperCase().substring(0, 2) + fabricante.getNombre().substring(2))
+					.map(fabricante -> fabricante.getNombre() + " " + fabricante.getNombre().toUpperCase().substring(0, 2))
 					.collect(Collectors.toList());
 
 			//TODO STREAMS
@@ -288,9 +288,13 @@ class TiendaTest {
 			prodHome.beginTransaction();
 		
 			List<Producto> listProd = prodHome.findAll();
-			listProd.stream();
+			List<String> Lista = listProd.stream()
+					.sorted(comparing((Producto producto) -> producto.getNombre()).thenComparing(comparing((Producto p) -> p.getPrecio()).reversed()))
+					.map(producto -> producto.getNombre() + " " + producto.getPrecio())
+					.toList();
 
-						
+			Lista.forEach(System.out::println);
+
 			//TODO STREAMS
 			
 			prodHome.commitTransaction();
@@ -312,6 +316,9 @@ class TiendaTest {
 			fabHome.beginTransaction();
 	
 			List<Fabricante> listFab = fabHome.findAll();
+			listFab.stream()
+					.limit(5)
+							.forEach(System.out::println);
 					
 			//TODO STREAMS
 		
@@ -335,6 +342,10 @@ class TiendaTest {
 			fabHome.beginTransaction();
 	
 			List<Fabricante> listFab = fabHome.findAll();
+			listFab.stream()
+					.skip(3)
+					.limit(2)
+							.forEach(System.out::println);
 					
 			//TODO STREAMS
 		
@@ -356,8 +367,14 @@ class TiendaTest {
 		try {
 			prodHome.beginTransaction();
 		
-			List<Producto> listProd = prodHome.findAll();		
-						
+			List<Producto> listProd = prodHome.findAll();
+
+			Optional<String> Barato = listProd.stream()
+					.sorted((comparing((Producto p) -> p.getPrecio())))
+					.findFirst()
+							.map(producto -> producto.getNombre() + " " + producto.getPrecio());
+
+			System.out.println(Barato);
 			//TODO STREAMS
 				
 			prodHome.commitTransaction();
@@ -380,7 +397,15 @@ class TiendaTest {
 			prodHome.beginTransaction();
 		
 			List<Producto> listProd = prodHome.findAll();		
-						
+
+			Optional<String> Caro = listProd.stream()
+					.sorted((comparing((Producto p) -> p.getPrecio()).reversed()))
+							.findFirst()
+									.map(producto -> producto.getNombre() + " " + producto.getPrecio());
+
+
+			System.out.println(Caro);
+
 			//TODO STREAMS
 			
 			prodHome.commitTransaction();
@@ -403,8 +428,17 @@ class TiendaTest {
 		try {
 			prodHome.beginTransaction();
 		
-			List<Producto> listProd = prodHome.findAll();		
-						
+			List<Producto> listProd = prodHome.findAll();
+
+			final Set<Integer> setValidos = new HashSet<>();
+
+			setValidos.add(2);
+
+			listProd.stream()
+					.filter(producto -> setValidos.contains(producto.getFabricante().getCodigo()))
+					.map(producto -> producto.getNombre())
+					.forEach(System.out::println);
+
 			//TODO STREAMS
 				
 			prodHome.commitTransaction();
@@ -426,7 +460,12 @@ class TiendaTest {
 		try {
 			prodHome.beginTransaction();
 		
-			List<Producto> listProd = prodHome.findAll();		
+			List<Producto> listProd = prodHome.findAll();
+
+			listProd.stream()
+					.filter(producto -> producto.getPrecio() <= 120)
+					.map(producto -> producto.getNombre())
+					.forEach(System.out::println);
 						
 			//TODO STREAMS
 				
@@ -449,8 +488,13 @@ class TiendaTest {
 		try {
 			prodHome.beginTransaction();
 		
-			List<Producto> listProd = prodHome.findAll();		
-						
+			List<Producto> listProd = prodHome.findAll();
+
+			listProd.stream()
+					.filter(producto -> producto.getPrecio() > 400)
+					.map(producto -> producto.getNombre())
+					.forEach(System.out::println);
+
 			//TODO STREAMS
 				
 			prodHome.commitTransaction();
@@ -472,7 +516,12 @@ class TiendaTest {
 		try {
 			prodHome.beginTransaction();
 		
-			List<Producto> listProd = prodHome.findAll();	
+			List<Producto> listProd = prodHome.findAll();
+
+			listProd.stream()
+					.filter(producto -> producto.getPrecio() >= 80 && producto.getPrecio() <=300)
+					.map(producto -> producto.getNombre())
+					.forEach(System.out::println);
 			
 			//TODO STREAMS
 				
@@ -495,7 +544,11 @@ class TiendaTest {
 		try {
 			prodHome.beginTransaction();
 		
-			List<Producto> listProd = prodHome.findAll();		
+			List<Producto> listProd = prodHome.findAll();
+			listProd.stream()
+					.filter(producto -> producto.getPrecio() < 200 && producto.getFabricante().getCodigo() == 6)
+					.map(producto -> producto.getNombre())
+					.forEach(System.out::println);
 						
 			//TODO STREAMS
 				
@@ -517,9 +570,17 @@ class TiendaTest {
 		ProductoHome prodHome = new ProductoHome();	
 		try {
 			prodHome.beginTransaction();
-		
-			List<Producto> listProd = prodHome.findAll();		
-			
+
+			final Set<Integer> setValidos = new HashSet<>();
+
+			setValidos.add(1);
+			setValidos.add(3);
+			setValidos.add(5);
+
+			List<Producto> listProd = prodHome.findAll();
+
+			listProd.stream().filter(producto -> setValidos.contains(producto.getFabricante().getCodigo()))
+							.forEach(producto -> System.out.println(producto));
 			//TODO STREAMS
 				
 			prodHome.commitTransaction();
