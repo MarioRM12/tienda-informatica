@@ -602,7 +602,11 @@ class TiendaTest {
 		try {
 			prodHome.beginTransaction();
 		
-			List<Producto> listProd = prodHome.findAll();		
+			List<Producto> listProd = prodHome.findAll();
+
+			listProd.stream()
+					.map(producto -> producto.getNombre() + " " + producto.getPrecio()*100 + " Céntimos")
+					.forEach(System.out::println);
 			
 			//TODO STREAMS
 				
@@ -629,6 +633,10 @@ class TiendaTest {
 			fabHome.beginTransaction();
 	
 			List<Fabricante> listFab = fabHome.findAll();
+			listFab.stream()
+					.map(Fabricante::getNombre)
+					.filter(fabricante -> fabricante.startsWith("S"))
+					.forEach(System.out::println);
 					
 			//TODO STREAMS
 		
@@ -651,8 +659,12 @@ class TiendaTest {
 		ProductoHome prodHome = new ProductoHome();	
 		try {
 			prodHome.beginTransaction();
-		
+
 			List<Producto> listProd = prodHome.findAll();
+			listProd.stream()
+					.filter(producto -> producto.getNombre().contains("Portátil"))
+					.map(Producto::getNombre)
+					.forEach(System.out::println);
 			
 			//TODO STREAMS
 				
@@ -677,6 +689,11 @@ class TiendaTest {
 			prodHome.beginTransaction();
 		
 			List<Producto> listProd = prodHome.findAll();
+
+			listProd.stream()
+					.filter(producto -> producto.getNombre().contains("Monitor") && producto.getPrecio() <= 215)
+					.map(producto -> producto.getNombre() + " " + producto.getPrecio())
+					.forEach(System.out::println);
 			
 			//TODO STREAMS
 				
@@ -688,122 +705,128 @@ class TiendaTest {
 		}
 		
 	}
-	
+
 	/**
-	 * 22. Lista el nombre y el precio de todos los productos que tengan un precio mayor o igual a 180€. 
+	 * 22. Lista el nombre y el precio de todos los productos que tengan un precio mayor o igual a 180€.
 	 * Ordene el resultado en primer lugar por el precio (en orden descendente) y en segundo lugar por el nombre (en orden ascendente).
 	 */
+	@Test
 	void test22() {
-		
-		
-		ProductoHome prodHome = new ProductoHome();	
+		ProductoHome prodHome = new ProductoHome();
 		try {
 			prodHome.beginTransaction();
-		
+
 			List<Producto> listProd = prodHome.findAll();
-			
-			//TODO STREAMS
-				
+
+			listProd.stream()
+					.filter(producto -> producto.getPrecio() >= 180)
+					.sorted(Comparator.comparing(Producto::getPrecio, Comparator.reverseOrder())
+							.thenComparing(Producto::getNombre))
+					.forEach(producto -> System.out.println(producto.getNombre() + " | " + producto.getPrecio()));
+
 			prodHome.commitTransaction();
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			prodHome.rollbackTransaction();
-		    throw e; // or display error message
+			throw e; // or display error message
 		}
-		
 	}
-	
+
 	/**
-	 * 23. Devuelve una lista con el nombre del producto, precio y nombre de fabricante de todos los productos de la base de datos. 
+	 * 23. Devuelve una lista con el nombre del producto, precio y nombre de fabricante de todos los productos de the base de datos.
 	 * Ordene el resultado por el nombre del fabricante, por orden alfabético.
 	 */
 	@Test
 	void test23() {
-		
-		ProductoHome prodHome = new ProductoHome();	
+		ProductoHome prodHome = new ProductoHome();
 		try {
 			prodHome.beginTransaction();
-		
+
 			List<Producto> listProd = prodHome.findAll();
-			
-			//TODO STREAMS
-			
+
+			listProd.stream()
+					.sorted(Comparator.comparing(producto -> producto.getFabricante().getNombre()))
+					.forEach(producto -> System.out.println(producto.getNombre() + " | " + producto.getPrecio() + " | " + producto.getFabricante().getNombre()));
+
 			prodHome.commitTransaction();
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			prodHome.rollbackTransaction();
-		    throw e; // or display error message
+			throw e; // or display error message
 		}
-		
 	}
-	
+
+
 	/**
 	 * 24. Devuelve el nombre del producto, su precio y el nombre de su fabricante, del producto más caro.
 	 */
 	@Test
 	void test24() {
-		
-		ProductoHome prodHome = new ProductoHome();	
+		ProductoHome prodHome = new ProductoHome();
 		try {
 			prodHome.beginTransaction();
-		
+
 			List<Producto> listProd = prodHome.findAll();
-			
-			//TODO STREAMS
-			
+
+			Optional<Producto> mostExpensiveProduct = listProd.stream()
+					.max(Comparator.comparing(Producto::getPrecio));
+
+			mostExpensiveProduct.ifPresent(producto -> {
+				System.out.println(producto.getNombre() + " | " + producto.getPrecio() + " | " + producto.getFabricante().getNombre());
+			});
+
 			prodHome.commitTransaction();
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			prodHome.rollbackTransaction();
-		    throw e; // or display error message
+			throw e; // or display error message
 		}
-		
 	}
-	
+
+
 	/**
 	 * 25. Devuelve una lista de todos los productos del fabricante Crucial que tengan un precio mayor que 200€.
 	 */
 	@Test
 	void test25() {
-		
-		ProductoHome prodHome = new ProductoHome();	
+		ProductoHome prodHome = new ProductoHome();
 		try {
 			prodHome.beginTransaction();
-		
+
 			List<Producto> listProd = prodHome.findAll();
-			
-			//TODO STREAMS
-			
+
+			listProd.stream()
+					.filter(producto -> producto.getFabricante().getNombre().equals("Crucial") && producto.getPrecio() > 200)
+					.forEach(producto -> System.out.println(producto.getNombre()));
+
 			prodHome.commitTransaction();
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			prodHome.rollbackTransaction();
-		    throw e; // or display error message
+			throw e; // or display error message
 		}
-		
 	}
-	
+
+
 	/**
 	 * 26. Devuelve un listado con todos los productos de los fabricantes Asus, Hewlett-Packard y Seagate
 	 */
 	@Test
 	void test26() {
-		
-		ProductoHome prodHome = new ProductoHome();	
+		ProductoHome prodHome = new ProductoHome();
 		try {
 			prodHome.beginTransaction();
-		
+
 			List<Producto> listProd = prodHome.findAll();
-			
-			//TODO STREAMS
-			
+
+			listProd.stream()
+					.filter(producto -> {
+						String fabricante = producto.getFabricante().getNombre();
+						return fabricante.equals("Asus") || fabricante.equals("Hewlett-Packard") || fabricante.equals("Seagate");
+					})
+					.forEach(producto -> System.out.println(producto.getNombre()));
+
 			prodHome.commitTransaction();
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			prodHome.rollbackTransaction();
-		    throw e; // or display error message
+			throw e; // or display error message
 		}
-		
 	}
 	
 	/**
@@ -819,25 +842,25 @@ Portátil Yoga 520      |452.79            |Lenovo
 Portátil Ideapd 320    |359.64000000000004|Lenovo
 Monitor 27 LED Full HD |199.25190000000003|Asus
 
-	 */		
+	 */
 	@Test
 	void test27() {
-		
-		ProductoHome prodHome = new ProductoHome();	
+		ProductoHome prodHome = new ProductoHome();
 		try {
 			prodHome.beginTransaction();
-		
+
 			List<Producto> listProd = prodHome.findAll();
-			
-			//TODO STREAMS
-			
+
+			listProd.stream()
+					.filter(producto -> producto.getPrecio() >= 180)
+					.sorted(Comparator.comparing(Producto::getPrecio).reversed().thenComparing(Producto::getNombre))
+					.forEach(producto -> System.out.printf("%-25s%-20s%-20s%n", producto.getNombre(), producto.getPrecio(), producto.getFabricante().getNombre()));
+
 			prodHome.commitTransaction();
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			prodHome.rollbackTransaction();
-		    throw e; // or display error message
+			throw e; // or display error message
 		}
-		
 	}
 	
 	/**
@@ -896,16 +919,16 @@ Fabricante: Xiaomi
 	 */
 	@Test
 	void test28() {
-	
+
 		FabricanteHome fabHome = new FabricanteHome();
-		
+
 		try {
 			fabHome.beginTransaction();
-	
+
 			List<Fabricante> listFab = fabHome.findAll();
-					
+
 			//TODO STREAMS
-								
+
 			fabHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
@@ -919,16 +942,16 @@ Fabricante: Xiaomi
 	 */
 	@Test
 	void test29() {
-	
+
 		FabricanteHome fabHome = new FabricanteHome();
-		
+
 		try {
 			fabHome.beginTransaction();
-	
+
 			List<Fabricante> listFab = fabHome.findAll();
-					
+
 			//TODO STREAMS
-								
+
 			fabHome.commitTransaction();
 		}
 		catch (RuntimeException e) {
