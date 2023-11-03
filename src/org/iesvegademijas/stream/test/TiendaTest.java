@@ -851,10 +851,13 @@ Monitor 27 LED Full HD |199.25190000000003|Asus
 
 			List<Producto> listProd = prodHome.findAll();
 
+			System.out.println("Nombre del Producto                 | Precio               | Nombre del Fabricante");
+			System.out.println("----------------------------------------------------------------------------------");
+
 			listProd.stream()
 					.filter(producto -> producto.getPrecio() >= 180)
 					.sorted(Comparator.comparing(Producto::getPrecio).reversed().thenComparing(Producto::getNombre))
-					.forEach(producto -> System.out.printf("%-25s%-20s%-20s%n", producto.getNombre(), producto.getPrecio(), producto.getFabricante().getNombre()));
+					.forEach(producto -> System.out.printf("%-35s | %-20s | %-20s%n", producto.getNombre(), producto.getPrecio(), producto.getFabricante().getNombre()));
 
 			prodHome.commitTransaction();
 		} catch (RuntimeException e) {
